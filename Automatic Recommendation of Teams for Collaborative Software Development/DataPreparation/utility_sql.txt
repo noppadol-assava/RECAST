@@ -1,0 +1,85 @@
+SELECT * FROM `process` WHERE issuekey IN (SELECT issuekey FROM team WHERE dev is not null
+                                          or integrator is not null or peer is not null or tester is not null) INTO OUTFILE 'filtered.csv'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
+
+
+SELECT process.issuekey,statusseq,team.dev,team.integrator,team.peer,team.tester FROM process LEFT JOIN team on process.issuekey = team.issuekey WHERE process.issuekey IN (SELECT issuekey FROM team WHERE dev is not null
+                                          or integrator is not null or peer is not null or tester is not null) INTO OUTFILE 'new.csv'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
+
+
+SELECT issuekey from process WHERE statusseq LIKE '%Reopened%'
+INTO OUTFILE 'containReopen.csv' 
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
+
+
+SELECT * FROM changelog INTO OUTFILE 'changelog.csv' FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n'
+SELECT * FROM team WHERE issuekey in (SELECT * FROM notnullteam ORDER BY issuekey)
+INTO OUTFILE 'team.csv'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+
+SELECT issuekey FROM `issueinformation` WHERE status in ('resolved','closed') and resolution in ('Fixed','Done') and issuekey not in (SELECT issuekey FROM reopen_issue ORDER BY issuekey) and issuekey in (SELECT * FROM notnullteam ORDER BY issuekey)
+INTO OUTFILE 'winissue.csv'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+
+SELECT issuekey FROM `issueinformation` WHERE status in ('resolved','closed') 
+INTO OUTFILE 'closeresolve.csv'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+
+SELECT c.issuekey,component,title FROM issueinformation i INNER JOIN component c WHERE i.issuekey=c.issuekey
+INTO OUTFILE 'component_title.csv'
+FIELDS TERMINATED BY ';;;'
+-- ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+
+SELECT * INTO OUTFILE 'issuekey_comments.csv'
+    FIELDS TERMINATED BY ';' OPTIONALLY ENCLOSED BY '"'
+    LINES TERMINATED BY '\n'
+FROM comments;
+
+SELECT issuekey INTO OUTFILE 'C:/Users/noppa/Desktop/jira_req_decomposition/filterteamsize.csv'
+    FIELDS TERMINATED BY ';' OPTIONALLY ENCLOSED BY '"'
+    LINES TERMINATED BY '\n'
+from team GROUP by issuekey HAVING count(DISTINCT dev) + count(DISTINCT integrator) + count(DISTINCT peer) + count(DISTINCT tester) > 1
+
+SELECT issuekey, COUNT(u) 
+INTO OUTFILE 'C:/Users/noppa/Desktop/teamsize.csv'
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+FROM (SELECT issuekey, dev as u FROM team UNION
+SELECT issuekey, integrator as u FROM team UNION
+SELECT issuekey, peer as u FROM team UNION
+SELECT issuekey, tester as u FROM team UNION
+SELECT issuekey, username as u FROM assignee WHERE issuekey in (SELECT issuekey FROM team ORDER BY issuekey)) a WHERE u is not null GROUP BY issuekey
+
+mysqldump -u jira-dev -p jira_apache comments  --fields-terminated-by ';' \
+--fields-enclosed-by '"' --fields-escaped-by '\' \
+--no-create-info --tab /home/noppadolass/
+
+mysql --user=jira-dev -p --database=jira_atlassian -B -e "select issuekey,logid,username,timecreated,field from changelog;" | sed "s/'/\'/;s/\t/\"\;\"/g;s/^/\"/;s/$/\"/;s/\n//g" > changelog.csv
+mysql --user=jira-dev -p --database=jira_atlassian -B -e "select * from comments;" | sed "s/'/\'/;s/\t/\"\;\"/g;s/^/\"/;s/$/\"/;s/\n//g" > issuekey_comments.csv
+mysql --user=jira-dev -p --database=jira_atlassian -B -e "select * from issuelink;" | sed "s/'/\'/;s/\t/\"\;\"/g;s/^/\"/;s/$/\"/;s/\n//g" > issuelink.csv
+
+mysql -u jira-dev -p --database=jira_apache --execute='' --fields-terminated-by ';' --fields-enclosed-by '"' --fields-escaped-by '\' -X > test.csv
+
+mysql --user=jira-dev -p --database=jira_apache -B -e "select * from tags;" | sed "s/'/\'/;s/\t/,/g;s/^//;s/$//;s/\n//g" > tags.csv
+
+mysql --user=jira-dev -p --database=jira_apache -B -e "select * from user_displayname;" | sed  "s/'/\'/;s/\t/\"\,\"/g;s/^/\"/;s/$/\"/;s/\n//g" > useridmap.csv
+
+mysql --user=jira-dev -p --database=jira_apache -B -e "select * from assignee;" | sed "s/'/\'/;s/\t/\"\;\"/g;s/^/\"/;s/$/\"/;s/\n//g" > assignee.csv
+mysql --user=jira-dev -p --database=jira_apache -B -e "select * from tester;" | sed "s/'/\'/;s/\t/\"\;\"/g;s/^/\"/;s/$/\"/;s/\n//g" > tester.csv
+mysql --user=jira-dev -p --database=jira_apache -B -e "select * from peer_reviewer;" | sed "s/'/\'/;s/\t/\"\;\"/g;s/^/\"/;s/$/\"/;s/\n//g" > peer_reviewer.csv
+mysql --user=jira-dev -p --database=jira_apache -B -e "select * from integrator;" | sed "s/'/\'/;s/\t/\"\;\"/g;s/^/\"/;s/$/\"/;s/\n//g" > integrator.csv
+mysql --user=jira-dev -p --database=jira_apache -B -e "select * from developer;" | sed "s/'/\'/;s/\t/\"\;\"/g;s/^/\"/;s/$/\"/;s/\n//g" > developer.csv

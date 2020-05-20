@@ -1,0 +1,4 @@
+MATCH (start:Person{name:'pilpi'}), (end:Person{name:'cibot'})
+CALL algo.shortestPath.stream(start, end, 'weight')
+YIELD nodeId, cost
+RETURN algo.asNode(nodeId).name AS name, cost
