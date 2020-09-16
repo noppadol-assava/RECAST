@@ -18,4 +18,5 @@ The order for running the code are as follows:
 If you have any questions on this project or get stuck during code execution, feel free to create issue on this repository together with `hitnothit` label.
 We will generate the assignee team by using our code to fix your issue.
 
-If you need support urgently, help yourself.
+## Data
+The raw data, preprocessed data, and the result of team recommendation can be download [here](https://drive.google.com/drive/folders/1D12UKF_05uh4AS9XiLdocxEP8nqFcS8q?usp=sharing).
