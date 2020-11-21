@@ -16,7 +16,7 @@ The order for running the code are as follows:
 7. [Evaluation by P, R, F1, MRR](Evaluation/)
 
 ## Note to rerun experiment
-The "Files" directory is needed to be place in the same directory as the project. Please download it in data link ("Files.zip" is in the Processed Data directory in the data download link.) The filepathhelper.py file is the utility file for helping with filepath in "Files" directory. In addition, please edit config.json according to the dataset ("Moodle","Apache", or "Atlassian"). The step 1-5 is for aquire the processced files. If you download the processced files, you can skip and run the Team Recommendation code.
+The "Files" directory is needed to be placed in the same directory as the project. Please download it in the data link ("Files.zip" is in the Processed Data directory in the data download link.) The filepathhelper.py file is the utility file for helping with the path of the files in the "Files" directory. In addition, please edit config.json according to the dataset ("Moodle", "Apache", or "Atlassian"). Steps 1-5 are used for getting the processed files from the raw data. If you download the processed files, you can skip and run the Team Recommendation code.
 
 ## Support
 If you have any questions on this project or get stuck during code execution, feel free to create issue on this repository together with `hitnothit` label.
