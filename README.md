@@ -1,18 +1,22 @@
 # Automatic Recommendation of Teams for Collaborative Software Development
-Here is the source code that we used in {title of paper}.
 
 ## Running Experiment
 Since this research was broken down into many sections, the instruction for running/compile/execute on each section will be written in __README.md__ on each folder of each part.
 
 The order for running the code are as follows:
-1. Data Collection
-2. Data Cleaning & Preprocessing
-   - Sentiment Analysis
-   - Topic Modeling
-3. Network Generation
-4. Feature enginering
-5. Model Selection
-6. Evaluation
+1. [Data Collection](DataCollection/)
+2. Data Preparation
+   - [Data Cleaning & Preprocessing](DataPreparation/)
+   - [Sentiment Analysis](SentimentAnalysis/)
+   - [Topic Modeling](TopicModel/)
+3. [Network Generation](NetworkGeneration/)
+4. [Feature enginering](FeatureExtraction/)
+5. [Team Scoring Model Selection](ModelSelection/)
+6. [Team Recommendation](TeamRecommendation/)
+7. [Evaluation by P, R, F1, MRR](Evaluation/)
+
+## Note to rerun experiment
+The "Files" directory is needed to be place in the same directory as the project. Please download it in data link ("Files.zip" is in the Processed Data directory in the data download link.) The filepathhelper.py file is the utility file for helping with filepath in "Files" directory. In addition, please edit config.json according to the dataset ("Moodle","Apache", or "Atlassian"). The step 1-5 is for aquire the processced files. If you download the processced files, you can skip and run the Team Recommendation code.
 
 ## Support
 If you have any questions on this project or get stuck during code execution, feel free to create issue on this repository together with `hitnothit` label.
